@@ -1,5 +1,6 @@
 data/
 dump/
+plots/
 models/
 *.DS_Store
 *.npz

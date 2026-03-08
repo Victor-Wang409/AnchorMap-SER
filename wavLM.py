@@ -153,6 +153,22 @@ class Trainer():
 
         self.loss = nn.CrossEntropyLoss()
         self.write = config.write
+
+        # 【新增】：1. 根据 AVLearner 中的锚点，初始化拓扑先验矩阵
+        # 这里假设使用 IEMOCAP 的 4 个锚点: 0:Ang, 1:Hap, 2:Neu, 3:Sad
+        anchors = torch.tensor([
+            [-0.51,  0.59,  0.25],
+            [-0.60,  0.35,  0.11],
+            [ 0.81,  0.51,  0.46],
+            [ 0.00,  0.00,  0.00],
+            [-0.63, -0.27, -0.33]
+        ], dtype=torch.float32, device=config.device)
+        
+        # 计算锚点两两之间的余弦相似度矩阵，作为先验拓扑目标
+        self.anchor_sim_matrix = F.cosine_similarity(anchors.unsqueeze(1), anchors.unsqueeze(0), dim=-1)
+        
+        # 定义拓扑损失的权重
+        self.lambda_topology = 0.1 # 这个超参可以根据实验调
         
         if config.use_wandb:
             wandb_save_path = "/dump"
@@ -203,8 +219,23 @@ class Trainer():
 
             pred_logits, final_emb, _ = self.clf(hiddens, feature_length)
             label = torch.tensor(batch['emotion'], device=device)
+
+            # 1. 原始的分类交叉熵 Loss
+            ce_loss = self.loss(pred_logits, label) 
+
+            # 【新增】：2. 计算 Batch 内部特征的余弦相似度 (N, N)
+            # final_emb shape: (batch_size, hidden_dim)
+            batch_sim = F.cosine_similarity(final_emb.unsqueeze(1), final_emb.unsqueeze(0), dim=-1)
             
-            loss = self.loss(pred_logits, label) 
+            # 【新增】：3. 获取当前 Batch 对应的先验锚点相似度目标 (N, N)
+            target_sim = self.anchor_sim_matrix[label][:, label]
+            
+            # 【新增】：4. 计算拓扑正则化损失 (Topology Loss)
+            # 使用 MSE 约束模型特征相似度逼近锚点相似度
+            topology_loss = F.mse_loss(batch_sim, target_sim)
+            
+            # 5. 联合优化
+            loss = ce_loss + self.lambda_topology * topology_loss
 
             if is_training:
                 loss.backward()
