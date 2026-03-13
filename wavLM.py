@@ -31,37 +31,6 @@ def my_collate(batch):
     processed = feature_extractor(audios, sampling_rate=16000, return_tensors="pt", padding=True)
     return {"audio": processed, "emotion": emotions}
 
-# class EmotionClassifier(nn.Module):
-#     def __init__(self, layer_num, emb_dim, num_labels, hidden_dim=100):
-#         super().__init__()
-#         self.layer_num = layer_num
-#         self.emb_dim = emb_dim
-
-#         self.weights = nn.Parameter(torch.randn(layer_num))
-#         self.proj = nn.Linear(emb_dim, hidden_dim)
-#         self.out = nn.Linear(hidden_dim, num_labels)
-#         nn.init.xavier_uniform_(self.proj.weight)
-#         nn.init.xavier_uniform_(self.out.weight)
-    
-#     def forward(self, feature, feature_lens):
-#         stacked_feature = torch.stack(feature, dim=0)
-#         _, *origin_shape = stacked_feature.shape
-#         stacked_feature = stacked_feature.view(self.layer_num, -1)
-#         norm_weights = F.softmax(self.weights, dim=-1)
-#         weighted_feature = (norm_weights.unsqueeze(-1) * stacked_feature).sum(dim=0)
-#         weighted_feature = weighted_feature.view(*origin_shape)
-
-#         agg_vec_list = []
-#         for i in range(len(weighted_feature)):
-#             agg_vec = torch.mean(weighted_feature[i][:feature_lens[i]], dim=0)
-#             agg_vec_list.append(agg_vec)
-
-#         avg_emb = torch.stack(agg_vec_list)
-
-#         final_emb = self.proj(avg_emb)
-#         pred = self.out(final_emb)
-#         return pred, final_emb
-
 class EmotionClassifier(nn.Module):
     def __init__(self, layer_num, emb_dim, num_labels, hidden_dim=100):
         super().__init__()
@@ -154,14 +123,17 @@ class Trainer():
         self.loss = nn.CrossEntropyLoss()
         self.write = config.write
 
-        # 【新增】：1. 根据 AVLearner 中的锚点，初始化拓扑先验矩阵
-        # 这里假设使用 IEMOCAP 的 4 个锚点: 0:Ang, 1:Hap, 2:Neu, 3:Sad
+        # 根据 AVLearner 中的锚点，初始化拓扑先验矩阵
         anchors = torch.tensor([
-            [-0.51,  0.59,  0.25],
-            [-0.60,  0.35,  0.11],
-            [ 0.81,  0.51,  0.46],
-            [ 0.00,  0.00,  0.00],
-            [-0.63, -0.27, -0.33]
+        [-0.51,  0.59,  0.25],
+        [-0.60,  0.35,  0.11],
+        [ 0.62,  0.75,  0.38],
+        [-0.64,  0.60, -0.43],
+        [-0.64,  0.52, -0.35],
+        [ 0.81,  0.51,  0.46],
+        [ 0.00,  0.00,  0.00],
+        [-0.63, -0.27, -0.33],
+        [ 0.40,  0.67, -0.13]
         ], dtype=torch.float32, device=config.device)
         
         # 计算锚点两两之间的余弦相似度矩阵，作为先验拓扑目标

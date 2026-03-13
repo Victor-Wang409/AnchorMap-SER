@@ -17,8 +17,7 @@ def plot_dynamic_weights_heatmap(pickle_path, output_dir):
     emotions = data['emotion']        # 形状: (样本数,)
     
     # 情感标签映射字典 (请根据你 IEMOCAP 预处理的实际 mapping 调整)
-    # 假设 0: Ang, 1: Hap, 2: Neu, 3: Sad
-    emo_mapping = {0: 'Angry', 1: 'Happy', 2: 'Neutral', 3: 'Sad'}
+    emo_mapping = {0: 'Angry', 1: 'Happy', 2: 'Excitement', 3: 'Fear', 4: 'Frustration', 5: 'Happiness', 6: 'Neutral', 7: 'Sadness', 8: 'Surprise'}
     
     # 1. 计算每种情感的平均层级权重
     layer_num = weights.shape[1]

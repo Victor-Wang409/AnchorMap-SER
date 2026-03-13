@@ -41,6 +41,21 @@ def ld_iemocap_partial5():
     ])
     return np.array(ld)
 
+def ld_iemocap_partialfull():
+    # ang, dis, exc, fear, fru, hap, neu, sad, sur
+    ld = np.array([
+        [-0.51,  0.59,  0.25],
+        [-0.60,  0.35,  0.11],
+        [ 0.62,  0.75,  0.38],
+        [-0.64,  0.60, -0.43],
+        [-0.64,  0.52, -0.35],
+        [ 0.81,  0.51,  0.46],
+        [ 0.00,  0.00,  0.00],
+        [-0.63, -0.27, -0.33],
+        [ 0.40,  0.67, -0.13]
+    ])
+    return np.array(ld)
+
 def ld_emodb():
     # ['angry', 'boredom', 'disgust', 'fear', 'happy', 'neutral', 'sad']
     return np.array([
