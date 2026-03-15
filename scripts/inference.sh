@@ -1,4 +1,4 @@
-python wavLM.py --data ./data/audio_partial5_train_dataset.pickle \
+python wavLM.py --data ./data/audio_partial_train_dataset.pickle \
                 --mode inference \
                 --num-labels 9 \
                 --load-path ./dump/train/model_best.pth \

@@ -1,6 +1,10 @@
 import sys, os
 import matplotlib.pyplot as plt
-sys.path.append('module/umap')
+# Get the absolute path to the local module
+local_umap_path = os.path.abspath('module/umap')
+
+# Insert at the BEGINNING (index 0) of sys.path to override installed packages
+sys.path.insert(0, local_umap_path)
 import umap
 import numpy as np
 import pandas as pd
@@ -92,9 +96,8 @@ def load_data(name):
         print(f"Detected 5 classes. Using ld_iemocap_partial5.")
         init_global = ld_iemocap_partial5()
     else:
-        # 默认回退到 4 类 (因为您明确要求了)
         print(f"Warning: Detected {unique_labels} classes, but defaulting to ld_iemocap (4 classes) as requested.")
-        init_global = ld_iemocap()
+        init_global =  ld_iemocap_partialfull()
 
     embeddings, label = data['embeddings'], data['emotion']
     return {"embedding":embeddings, "label": label, "init_global": init_global, "data":data}
@@ -134,7 +137,6 @@ class AVLearner:
         return self.reducer.transform(embedding)
 
     def fit_transform(self, embedding, labels, anchor_mappings):
-        # anchor_mappings 现在是 (4, 3) 的矩阵
         init = self.reducer.set_custom_intialization(embedding, labels, anchor_mappings)
         return self.reducer.fit_transform(embedding, labels)
 
@@ -189,7 +191,7 @@ def calc_ccc(x, y):
 
 if __name__ == "__main__":
     # 1. 加载数据
-    data = load_data('iemocap_partial5')
+    data = load_data('iemocap_partialfull')
     
     # 2. 运行 AVLearner (3D)
     final_coords = train_inference(data) # shape: (N, 3)

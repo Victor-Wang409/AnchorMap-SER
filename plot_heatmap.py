@@ -16,8 +16,8 @@ def plot_dynamic_weights_heatmap(pickle_path, output_dir):
     weights = data['dynamic_weights'] # 形状: (样本数, layer_num)
     emotions = data['emotion']        # 形状: (样本数,)
     
-    # 情感标签映射字典 (请根据你 IEMOCAP 预处理的实际 mapping 调整)
-    emo_mapping = {0: 'Angry', 1: 'Happy', 2: 'Excitement', 3: 'Fear', 4: 'Frustration', 5: 'Happiness', 6: 'Neutral', 7: 'Sadness', 8: 'Surprise'}
+    # 情感标签映射字典
+    emo_mapping = {0: 'Angry', 1: 'Disgust', 2: 'Excitement', 3: 'Fear', 4: 'Frustration', 5: 'Happiness', 6: 'Neutral', 7: 'Sadness', 8: 'Surprise'}
     
     # 1. 计算每种情感的平均层级权重
     layer_num = weights.shape[1]
@@ -48,16 +48,15 @@ def plot_dynamic_weights_heatmap(pickle_path, output_dir):
     ax = sns.heatmap(df, 
                      cmap="YlOrRd", 
                      annot=False,            # 如果想在帖子上显示具体数值，可以改为 True
-                     linewidths=0.5,         # 增加格子间的微小分割线，显得更清爽
-                     cbar_kws={'label': 'Average Attention Weight'})
+                     linewidths=0.5)         # 增加格子间的微小分割线，显得更清爽
 
-    # 4. 优化字体和标签细节
-    plt.title('Dynamic Feature Fusion Weights across WavLM Layers', fontsize=16, fontweight='bold', pad=20)
-    plt.xlabel('Emotion Category', fontsize=14, fontweight='bold')
-    plt.ylabel('WavLM Transformer Layers', fontsize=14, fontweight='bold')
+    # # 4. 优化字体和标签细节
+    # plt.title('Dynamic Feature Fusion Weights across WavLM Layers', fontsize=16, fontweight='bold', pad=20)
+    # plt.xlabel('Emotion Category', fontsize=14, fontweight='bold')
+    # plt.ylabel('WavLM Transformer Layers', fontsize=14, fontweight='bold')
     
     # 调整坐标轴刻度字体大小
-    plt.xticks(fontsize=12)
+    plt.xticks(fontsize=12, rotation=45)
     plt.yticks(fontsize=10, rotation=0)
 
     plt.tight_layout()

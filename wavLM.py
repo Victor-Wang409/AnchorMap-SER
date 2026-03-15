@@ -140,7 +140,7 @@ class Trainer():
         self.anchor_sim_matrix = F.cosine_similarity(anchors.unsqueeze(1), anchors.unsqueeze(0), dim=-1)
         
         # 定义拓扑损失的权重
-        self.lambda_topology = 0.1 # 这个超参可以根据实验调
+        self.lambda_topology = 0 # 这个超参可以根据实验调
         
         if config.use_wandb:
             wandb_save_path = "/dump"
@@ -362,9 +362,8 @@ if __name__ == "__main__":
     parser.add_argument('--num-epochs', type=int, default=21, help='number of epochs for training')
     parser.add_argument('--batch-size', type=int, default=32, help='batch size for training')
 
-    # 注意：请确保运行脚本里的 --data 参数指向最初的 .pickle 原始数据集
     parser.add_argument('--data', type=str, default='/data/audio_dataset.pickle', help='path to training data')
-    parser.add_argument('--num-labels', type=int, default=4, help='number of categories in data')
+    parser.add_argument('--num-labels', type=int, default=9, help='number of categories in data')
     parser.add_argument('--save-path', type=str, default='/dump/', help='path to save trained model')
     parser.add_argument('--load-path', type=str, default='', help='path to load pretrained model') 
 

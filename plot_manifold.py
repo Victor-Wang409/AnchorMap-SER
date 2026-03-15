@@ -17,7 +17,7 @@ def plot_feature_space_tsne(pickle_path, output_dir):
 
     # 为了学术严谨性，流形可视化通常只展示 Test 集，证明模型的泛化能力
     # 如果您想展示所有数据，可以将这里的判断去掉
-    test_idx = np.where(np.array(status) == 'test')[0]
+    test_idx = np.where(np.array(status) != '')[0]
     
     if len(test_idx) == 0:
         print("Warning: No 'test' samples found. Using all samples instead.")
@@ -27,7 +27,17 @@ def plot_feature_space_tsne(pickle_path, output_dir):
     test_emo = np.array(emotions)[test_idx]
 
     # IEMOCAP 情感映射字典 (请根据实际情况调整)
-    emo_mapping = {0: 'Angry', 1: 'Happy', 2: 'Neutral', 3: 'Sad', 4: 'Excited'}
+    emo_mapping = {
+        0: "Angry",
+        1: "Happy", 
+        2: "Neutral",
+        3: "Sad",
+        4: "Disgust",
+        5: "Excitement",
+        6: "Fear",
+        7: "Frustration",
+        8: "Surprise"
+    }
     emo_labels = [emo_mapping[e] for e in test_emo]
 
     print(f"Running t-SNE on {len(test_emb)} samples. This might take a few seconds...")
@@ -49,15 +59,6 @@ def plot_feature_space_tsne(pickle_path, output_dir):
     plt.figure(figsize=(9, 7), dpi=300)
     sns.set_theme(style="ticks") # ticks 风格比纯白底色多了一些刻度线，更具学术感
 
-    # 为不同情感指定符合直觉的颜色 (例如：愤怒-红色，悲伤-蓝色，快乐-黄色，中性-灰色)
-    palette = {
-        'Angry': '#d62728',   # 红色
-        'Happy': '#ff7f0e',   # 橘黄色
-        'Neutral': '#7f7f7f', # 灰色
-        'Sad': '#1f77b4',      # 蓝色
-        'Excited': '#1f77a3'      # 蓝色
-    }
-
     # 绘制散点图
     # alpha=0.8 增加透明度防止重叠遮挡, edgecolor 增加描边让点更清晰
     ax = sns.scatterplot(
@@ -65,8 +66,8 @@ def plot_feature_space_tsne(pickle_path, output_dir):
         x='t-SNE Dimension 1', 
         y='t-SNE Dimension 2',
         hue='Emotion', 
-        palette=palette, 
-        s=60, 
+        palette="deep",    # 学术界常用的沉稳配色
+        s=20, 
         alpha=0.85, 
         edgecolor='w',
         linewidth=0.5
